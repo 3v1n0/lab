@@ -1,0 +1,43 @@
+name: lab
+base: core18
+version: git
+summary: Wraps Git or Hub, making it simple to interact with repositories on GitLab
+description: |
+  Lab wraps Git or Hub, making it simple to clone, fork, and interact with
+  repositories on GitLab, including seamless workflows for creating merge
+  requests, issues and snippets.
+
+    $ lab clone gitlab-com/infrastructure
+
+    # expands to:
+    $ git clone git@gitlab.com:gitlab-com/infrastructure
+
+grade: stable
+confinement: classic
+
+parts:
+  lab:
+    # plugin: go
+    # source: .
+    # go-importpath: github.com/zaquestion/lab
+    # go-channel: latest/stable
+    # # build-packages:
+    # #   - build-essential
+    # build-snaps:
+    #   - go
+    plugin: nil
+    source: .
+    build-packages:
+      - build-essential
+    build-snaps:
+      - go
+    override-build: |
+      # go build -o $SNAPCRAFT_PROJECT_NAME -ldflags "-X \"main.version=$(git  rev-parse --short=10 HEAD)\"" .
+      go build -o $SNAPCRAFT_PROJECT_NAME .
+      mv -v $SNAPCRAFT_PROJECT_NAME $SNAPCRAFT_PART_INSTALL
+      ldd $SNAPCRAFT_PART_INSTALL/$SNAPCRAFT_PROJECT_NAME
+      snapcraftctl build
+
+apps:
+  lab:
+    command: lab
